@@ -1,4 +1,6 @@
 #load './piece.rb'
+require 'debugger'
+# require_relative 'piece'
 
 class Board
 
@@ -14,22 +16,38 @@ class Board
 		self.black_pieces = [grid[3][4], grid[4][3]]
 	end
 
-	def straight?(piece, position)
-		piece_row = piece.position[0]
-		piece_col = piece.position[1]
-		play_row = position[0]
-		play_col = position[1]
-		return true if piece_row == play_row || piece_col == play_col
-		return true if (piece_row - play_row).abs == (piece_col- play_col).abs
-		false
+	def on_board?(pos)
+		(0..7).include?(pos[0]) && (0..7).include?(pos[1])
 	end
 
-	# def get_path(start_pos, end_pos)
-	# 	output = []
-	# 	if start_pos[0] == end_pos[0] && start_pos[1] < end_pos[1]
-	# 		start_pos[1].upto(end_pos[1]) do |indx|
-	#
-	# end
+	def get_direction(color, pos)
+		output = []
+		direction_vectors = [[0, 1],
+												 [1, 1],
+												 [1, 0],
+												 [1, -1],
+												 [0, -1],
+												 [-1, -1],
+												 [-1, 0],
+												 [-1, 1]]
+		direction_vectors.each do |direction|
+			output << direction if same_color_in_this_direction?(color, pos, direction)
+		end
+		output
+	end
+
+	def same_color_in_this_direction?(color, pos, direction)
+		# debugger
+		# returns true / false
+		space_to_check = [pos[0] + direction[0], pos[1] + direction[1]]
+		return false if grid[space_to_check[0]][space_to_check[1]].nil?
+		return false if grid[space_to_check[0]][space_to_check[1]].color == color
+		until grid[space_to_check[0]][space_to_check[1]].nil?
+			return true if grid[space_to_check[0]][space_to_check[1]].color == color
+			space_to_check = [space_to_check[0] + direction[0], space_to_check[1] + direction[1]]
+		end
+		false
+	end
 
 	def place_piece(position, color)
 		row = position[0]
@@ -40,3 +58,18 @@ class Board
 
 
 end
+
+=begin
+board = Board.new
+red1_piece = Piece.new(:red, [1, 5])
+blk1_piece = Piece.new(:black, [3, 7])
+red2_piece = Piece.new(:red, [2, 0])
+blk2_piece = Piece.new(:black, [2, 3])
+blk3_piece = Piece.new(:black, [2,4])
+board.grid[1][5] = red1_piece
+board.grid[3][7] = blk1_piece
+board.grid[2][0] = red2_piece
+board.grid[2][3] = blk2_piece
+board.grid[2][4] = blk3_piece
+board.same_color_in_this_direction?([1, 5],[1, -1])
+=end

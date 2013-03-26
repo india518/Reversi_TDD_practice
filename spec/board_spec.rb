@@ -68,95 +68,75 @@ describe Board do
 
 	describe "#get_direction" do
 		let(:board) {Board.new}
-		let(:red1_piece) {Piece.new([1, 5], :red)}
-		let(:blk1_piece) {Piece.new([3, 7], :black)}
-		let(:red2_piece) {Piece.new([2, 0], :red)}
-		let(:blk2_piece) {Piece.new([2, 3], :black)}
+		let(:red1_piece) {Piece.new(:red, [1, 5])}
+		let(:blk1_piece) {Piece.new(:black, [3, 7])}
+		let(:red2_piece) {Piece.new(:red, [2, 0])}
+		let(:blk2_piece) {Piece.new(:black, [2, 3])}
+		let(:red3_piece) {Piece.new(:red, [2, 2])}
 
 		before do
 			board.grid[1][5] = red1_piece
 			board.grid[3][7] = blk1_piece
 			board.grid[2][0] = red2_piece
 			board.grid[2][3] = blk2_piece
+			board.grid[2][2] = red3_piece
 		end
 
 		it "takes the location in play and returns valid directions" do
-			board.get_direction([1, 5]).should == [[-1, -1]]
-			board.get_direction([3, 7]).should == [[ 0, -1]]
-			board.get_direction([2, 3]).should include([-1, 0])
-			board.get_direction([2, 3]).should include([1, 1])
+			board.get_direction(:black, [3, 2]).should include([0, 1])
+			board.get_direction(:red, [2, 4]).should include([0, -1])
+			board.get_direction(:red, [2, 4]).should include([1, 0])
 		end
 
-    it "returns nil if there is no valid direction" do
-			board.get_direction([2, 0]).should be_nil
+    it "returns empty if there is no valid direction" do
+			board.get_direction(:red, [1, 4]).should be_empty
+			board.get_direction(:red, [0, 0]).should be_empty
+			board.get_direction(:black, [5, 2]).should be_empty
+			board.get_direction(:red, [5, 2]).should be_empty
 		end
 	end
 
-
-	describe "#adjacant_enemy" do
-
+  describe "#same_color_in_this_direction?" do
+		# returns false if hits empty space in the direction or
+		# off the board and still not friendly piece
 		let(:board) {Board.new}
-		let(:red_piece) {Piece.new([2,2], :red)}
-		let(:blk_piece) {Piece.new([2,2], :black)}
+		let(:red1_piece) {Piece.new(:red, [1, 5])}
+		let(:blk1_piece) {Piece.new(:black, [3, 7])}
+		let(:red2_piece) {Piece.new(:red, [2, 0])}
+		let(:blk2_piece) {Piece.new(:black, [2, 3])}
+		let(:red3_piece) {Piece.new(:red, [2, 2])}
 
 		before do
-			board.grid[2][2] = red_piece
-			board.grid[2][5] = blk_piece
+			board.grid[1][5] = red1_piece
+			board.grid[3][7] = blk1_piece
+			board.grid[2][0] = red2_piece
+			board.grid[2][3] = blk2_piece
+			board.grid[2][2] = red3_piece
 		end
 
-		it "returns true if next to enemy" do
-			board.adjacent_enemy([3, 3]).should be_true
-			board.adjacent_enemy([3, 4]).should be_true
+
+		it "returns true if we find a piece.color in this direction" do
+			board.same_color_in_this_direction?(:black, [3, 2], [0, 1]).should be_true
+			board.same_color_in_this_direction?(:red, [2, 4], [0, -1]).should be_true
+			board.same_color_in_this_direction?(:red, [2, 4], [1, 0]).should be_true
+
 		end
 
-		it "returns false if not next to enemy" do
-			board.adjacent_enemy([2, 2]).should be_false
-			board.adjacent_enemy([2, 5]).should be_false
+		it "returns false if no matchin piece.color found" do
+			board.same_color_in_this_direction?(:red, [1, 4],[0,1]).should be_false
+			board.same_color_in_this_direction?(:red, [2, 0], [1, 0]).should be_false
+			board.same_color_in_this_direction?(:black, [2, 0], [1, 0]).should be_false
+			board.same_color_in_this_direction?(:red, [1, 5],[1, -1]).should be_false
+			board.same_color_in_this_direction?(:black, [1, 5],[1, -1]).should be_false
+			board.same_color_in_this_direction?(:black ,[5, 2],[-1, 1]).should be_false
 		end
 
 	end
 
+	describe "#flip" do
 
-	describe "#straight?" do
-		describe "returns true for a straight line b/w square in play and a piece" do
-			let(:piece) {Piece.new(:red, [3, 3])}
-			let(:board) {Board.new}
 
-			it "returns true when there is a straight line" do
-				board.straight?(piece, [0, 0]).should be_true
-				board.straight?(piece, [0, 3]).should be_true
-				board.straight?(piece, [4, 3]).should be_true
-				board.straight?(piece, [3, 0]).should be_true
-				board.straight?(piece, [1, 5]).should be_true
-				board.straight?(piece, [3, 7]).should be_true
-				board.straight?(piece, [4, 4]).should be_true
-				board.straight?(piece, [7, 3]).should be_true
-				board.straight?(piece, [7, 3]).should be_true
-			end
-
-			it "returns false when there is a straight line" do
-				board.straight?(piece, [0, 1]).should be_false
-				board.straight?(piece, [4, 5]).should be_false
-				board.straight?(piece, [7, 4]).should be_false
-			end
-
-		end
 	end
-
-	describe "#get_path" do
-
-		it "returns an array of positions(arrays) between two positions" do
-			get_path([3, 3],[0, 0]).should == [[2, 2], [1, 1]]
-			get_path([3, 3],[0, 3]).should == [[2, 3], [1, 3]]
-			get_path([3, 3],[4, 3]).should == []
-			get_path([3, 3],[3, 0]).should == [[3, 2], [3, 1]]
-			get_path([3, 3],[1, 5]).should == [[2, 4]]
-			get_path([3, 3],[3, 7]).should == [[3, 4], [3, 5], [3, 6]]
-			get_path([3, 3],[4, 4]).should == []
-			get_path([3, 3],[7, 3]).should == [[4, 3], [5, 3], [6, 3]]
-		end
-	end
-
 
 	describe "#find_line" do
 		# also checks

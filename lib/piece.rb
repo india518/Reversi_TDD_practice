@@ -1,4 +1,5 @@
 class Piece
+
   attr_accessor :color
 	attr_reader :position
 
