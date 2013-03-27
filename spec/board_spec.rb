@@ -135,92 +135,108 @@ describe Board do
 
 	describe "#flip" do
 
+		let(:board) {Board.new}
+		let(:red1_piece) {Piece.new(:red, [1, 5])}
+		let(:blk1_piece) {Piece.new(:black, [3, 7])}
+		let(:red2_piece) {Piece.new(:red, [2, 0])}
+		let(:blk2_piece) {Piece.new(:black, [2, 3])}
+		let(:red3_piece) {Piece.new(:red, [2, 2])}
 
-	end
-
-	describe "#find_line" do
-		# also checks
-
-		describe "checks for a line to each piece in the player's pieces array" do
-
-			let(:board) {Board.new}
-
-			it "returns a valid path" do
-				board.find_line([2, 4]).should == [3, 4]
-			end
-
-			it "returns nil if there is no path" do
-				board.find_line([3, 2]).should be_nil
-				board.find_line([0, 0]).should be_nil
-			end
-
-
-
+		before do
+			board.grid[1][5] = red1_piece
+			board.grid[3][7] = blk1_piece
+			board.grid[2][0] = red2_piece
+			board.grid[2][3] = blk2_piece
+			board.grid[2][2] = red3_piece
 		end
 
+			it "flips a red piece to a black piece" do
+				board.grid[3][3].color.should == :red
+				board.flip([3,2], :black, [0,1])
+				board.grid[3][3].color.should == :black
+			end
+
+			it "flips a black piece to a red piece" do
+				board.grid[2][3].color.should == :black
+				board.grid[3][4].color.should == :black
+				board.flip([2,4], :red, [0,-1])
+				board.flip([2,4], :red, [1,0])
+				board.grid[2][3].color.should == :red
+				board.grid[3][4].color.should == :red
+			end
 	end
 
-=begin
+
 	describe "#valid_move?" do
 
-		let(:myboard) {Board.new}
+		let(:board) {Board.new}
+		let(:red1_piece) {Piece.new(:red, [1, 5])}
+		let(:blk1_piece) {Piece.new(:black, [3, 7])}
+		let(:red2_piece) {Piece.new(:red, [2, 0])}
+		let(:blk2_piece) {Piece.new(:black, [2, 3])}
+		let(:red3_piece) {Piece.new(:red, [2, 2])}
 
-		it "returns false if position is not nil" do
-			myboard.valid_move?([3,3], :red).should be_false
+		before do
+			board.grid[1][5] = red1_piece
+			board.grid[3][7] = blk1_piece
+			board.grid[2][0] = red2_piece
+			board.grid[2][3] = blk2_piece
+			board.grid[2][2] = red3_piece
 		end
 
-		it "returns false if position is not on board" do
-			myboard.valid_move?([10,10], :black).should be_false
+		it "returns true if place to be is valid" do
+			board.valid_move?(:black, [3,2]).should be_true
+			board.valid_move?(:red, [2,4] ).should be_true
 		end
 
-		it "returns true if the move captures enemy piece(s)" do
-			myboard.valid_move?([2,4], :red).should be_true
-		end
-
-		it "returns false if the move does not capture enemy piece" do
-			myboard.valid_move?([2,3], :red).should be_false
-		end
-
-	end
-
-
-	describe "#place_piece" do
-
-		let(:myboard) { Board.new }
-
-		it "places a new piece in valid position" do
-			myboard.place_piece([2,4],:red)
-			myboard.grid[2][4].color.should == :red
-		end
-
-		it "places the new piece into the player's array" do
-	    FIND SYTNAX: myboard.red_pieces.should be_include
-
-
-		it "flips a captured piece" do
-			myboard.grid[3][4].color.should == :red
-		end
-
-	  it "removes the captures piece(s) from the other player's array"
-
-		it "forbids placing a new piece in illegal position" do
-			myboard.place_piece([0,0],:red)
-			myboard.grid[0][0].should be_nil
+		it "returns false if the place to be is not valid" do
+			board.valid_move?(:black, [5,2]).should be_false
+			board.valid_move?(:red, [5,2]).should be_false
+			board.valid_move?(:black, [5,0]).should be_false
 		end
 
 	end
-=end
 
 
+	describe "#place" do
 
-	it "should which pieces to flip" do
+		let(:board) {Board.new}
+		let(:red1_piece) {Piece.new(:red, [1, 5])}
+		let(:blk1_piece) {Piece.new(:black, [3, 7])}
+		let(:red2_piece) {Piece.new(:red, [2, 0])}
+		let(:blk2_piece) {Piece.new(:black, [2, 3])}
+		let(:red3_piece) {Piece.new(:red, [2, 2])}
+
+		before do
+			board.grid[1][5] = red1_piece
+			board.grid[3][7] = blk1_piece
+			board.grid[2][0] = red2_piece
+			board.grid[2][3] = blk2_piece
+			board.grid[2][2] = red3_piece
+		end
+
+
+		it "places a piece when the move is valid" do
+			board.grid[2][4].should be_nil
+			board.place(:red,[2, 4])
+			board.grid[2][4].color.should == :red
+		end
+
+		it "flips captured pieces" do
+			board.grid[2][3].color.should == :black
+			board.grid[3][4].color.should == :black
+			board.place(:red,[2, 4])
+			board.grid[2][3].color.should == :red
+			board.grid[3][4].color.should == :red
+		end
+
+		it "doesn't place piece when move is not valid" do
+			board.place(:red,[5, 2])
+			board.grid[5][2].should be_nil
+			board.place(:red,[0, 0])
+			board.grid[0][0].should be_nil
+		end
+
 	end
-
-	it "should check when the game is won" do
-	end
-
-	it "should keep track of points" do
-	end
-
 
 end

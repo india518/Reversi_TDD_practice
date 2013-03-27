@@ -49,13 +49,30 @@ class Board
 		false
 	end
 
-	def place_piece(position, color)
-		row = position[0]
-		col = position[1]
-		return unless valid_move?(position, color)
-		grid[row][col] = Piece.new(color, position)
+	def flip(position, color, direction)
+		current_space = [position[0]+direction[0], position[1]+direction[1]]
+		until grid[current_space[0]][current_space[1]].color == color
+			self.grid[current_space[0]][current_space[1]].flip
+			current_space[0] += direction[0]
+			current_space[1] += direction[1]
+		end
 	end
 
+	def valid_move?(color, pos)
+		direction_array = get_direction(color, pos)
+		return false if direction_array.empty?
+		true
+	end
+
+	def place(color, pos)
+		if valid_move?(color, pos)
+			self.grid[pos[0]][pos[1]] = Piece.new(color, pos)
+			direction_array = get_direction(color, pos)
+			direction_array.each do |direction|
+				flip(pos, color, direction)
+			end
+		end
+	end
 
 end
 
