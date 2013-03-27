@@ -6,6 +6,7 @@ describe Board do
 
 	describe "creates the starting board" do
 
+		#REV Board is your subject here, let is used to initialize side variables
 		let(:board) {Board.new}
 
 		it "returns an 8x8 grid" do
@@ -58,6 +59,8 @@ describe Board do
 		it "returns true if position is on board" do
 			board.on_board?([3,3]).should be_true
 		end
+
+		#REV Would this be a good place to throw an error instead of returning false?
 
 		it "returns false if position is not on board" do
 			board.on_board?([-1,1]).should be_false
@@ -168,6 +171,8 @@ describe Board do
 
 
 	describe "#valid_move?" do
+
+#REV if your Board object took an optional board array argument this would be much easier to set up
 
 		let(:board) {Board.new}
 		let(:red1_piece) {Piece.new(:red, [1, 5])}
